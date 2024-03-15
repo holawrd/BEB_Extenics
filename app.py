@@ -11,8 +11,8 @@ client = OpenAI(
     # api_key="sess-mq7xMO7fFmqHUA7P18BhMBURM1nRFBQvpQJ2EYPT",
     # # base_url="https://api.openai.com/"
     #GPT3.5
-    api_key="sk-kx0Llq2Xv124mqY5tlBHQ6Xs5995413MQzxRNJgxd0DY19tK",
-    base_url="https://api.chatanywhere.tech/v1"
+    #api_key="sk-kx0Llq2Xv124mqY5tlBHQ6Xs5995413MQzxRNJgxd0DY19tK",
+    #base_url="https://api.chatanywhere.tech/v1"
 )
 from bs4 import BeautifulSoup
 import requests
