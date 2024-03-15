@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基元库管理</title>
+
+    <script type="text/javascript" src="/static/cdn/vue.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/axios.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/vis-network.min.js"></script>
+    <link href="/static/cdn/index.css" rel="stylesheet">
+    <script src="/static/cdn/index.js"></script>
+
+</head>
+
+<link rel="icon" href="/static/img/icon.ico" type="image/x-icon">
+<body style="margin: 0 auto">
+<style>
+    body {
+        background-color: rgba(2, 67, 94, 1);
+        font-family: 'Microsoft YaHei', Arial, sans-serif;
+    }
+</style>
+<div id="app" style="margin: 0">
+
+    <div  style="margin: 0 auto; display: flex; ">
+
+        <div style="
+        position: fixed;
+        background: rgba(2, 67, 94, 1);
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 10vh;
+        opacity: 1;
+        z-index: 1;
+    ">
+
+        <a href="/main"  style="
+        position: absolute;
+        left: 6vw;
+        top: 2vh;
+        opacity: 1;
+        font-size: 25px;
+        max-width: 100%;
+        max-height: 100%;
+        font-weight: 900;
+        letter-spacing: 0;
+        line-height: 41px;
+        color: white;
+        text-align: left;
+        vertical-align: top;
+        text-decoration: none;
+    ">
+        基元库管理系统
+        </a>
+
+        <a href="https://extenics.gdut.edu.cn"  style="
+        position: absolute;
+        right: 3.75vw;
+        top: 3.55vh;
+        color: white;
+        text-decoration: none;
+    ">
+        访问可拓学官网
+        </a>
+
+        <a href="/basic_element"  style="
+        position: absolute;
+        right: 13.75vw;
+        top: 3.6vh;
+        color: rgba(2, 67, 94, 1);
+        text-decoration: none;
+        z-index: 6;
+    ">
+        基元管理
+        </a>
+
+        <a href="/user"  style="
+        position: absolute;
+        right: 20.75vw;
+        top: 3.6vh;
+        color: white;
+        text-decoration: none;
+        ">
+        用户管理
+        </a>
+            <div style="
+                    position: absolute;
+                    right: 12.5vw;
+                    top: 1.5vh;
+                    background-color: white;
+                    width: 100px;
+                    height: 85px;
+                    z-index: 3;
+                    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.5);
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    transform: skewY(-5deg);
+                ">
+                </div>
+
+
+    </div>
+
+    <div style="margin: 0 auto; display: flex; height: 100vh;">
+
+
+        <div style="position: absolute;
+                    right: 0;
+                    top: 8.5vh;
+                    bottom: 0;
+                    background-color: white;
+                    width: 100vw;
+                    {#height: 40vh;#}
+                    z-index: 10;
+                    box-sizing: border-box; ">
+
+            <div style="padding: 20px">
+
+                <div>
+
+                    <div style="display: inline-block;position: absolute;left:2vw; bottom:5vh; width: 33%;height: 81.5vh;background-color: white;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px; overflow: visible;z-index: 500;"
+                         id="network">
+                    </div>
+{#                    <div style="display: inline-block;position: absolute;right:2vw;width: 55%;height: 85vh;;background-color:white;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow: auto;border-radius: 10px;vertical-align: top">#}
+                        <div style="padding: 10px">
+                            <div>
+                                <div style="position: absolute;right:2vw;width: 858px;top:5vh;height: 12vh;;background-color:white;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow: auto;border-radius: 10px;padding: 20px">
+                                    <div style="display: flex;justify-content: flex-start; padding: 1px 0 0 0;margin-left: 0px;">
+                                        <div style="vertical-align: top; left:2vw; width: 18%;">
+                                            <el-select style="width: 80%;" v-model="selecta" placeholder="单元类型">
+                                                <el-option label="物元" value="物元"></el-option>
+                                                <el-option label="事元" value="事元"></el-option>
+                                                <el-option label="关系元" value="关系元"></el-option>
+                                            </el-select>
+                                        </div>
+
+
+                                        <div style="vertical-align: top; width: 20%;">
+                                            <div>
+                                                <el-input style="width: 80%;" v-model="name" placeholder="符号" v-on:input="checkInput"></el-input>
+                                            </div>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 20%;">
+                                            <div>
+                                                <el-input style="width: 80%;" v-model="obj" placeholder="对象"></el-input>
+                                            </div>
+                                        </div>
+
+
+                                        <div style="vertical-align: top; width: 19%;">
+                                            <el-button style="width: 80%; background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);" v-on:click="clisk_append" type="success">添加基元</el-button>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 22%;margin-left: 5px;">
+                                            <div v-if="nodes != ''">
+                                                <el-select style="width: 80%;" v-model="mubiaoid" placeholder="目标单元">
+                                                    <template v-for="i in nodes">
+                                                        <el-option :label="i.label['符号']" :value="i.id">
+                                                        </el-option>
+                                                    </template>
+                                                </el-select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div style="display: flex; padding: 10px 0 0 0;">
+                                        <div style="vertical-align: top; width: 18%;">
+                                            <el-select style="width: 80%;" v-model="to_start_id" placeholder="单元对象">
+                                                <template v-for="aa in nodes">
+                                                    <el-option :label="aa.label.符号" :value="aa.id"></el-option>
+                                                </template>
+                                            </el-select>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 20%;">
+                                            <el-input style="width: 80%;" v-model="tezheng" placeholder="特征"></el-input>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 20%;">
+                                            <el-input style="width: 80%;" v-model="va" placeholder="量值"></el-input>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 19%;">
+                                            <el-button style="width: 80%; background-color: rgb(3,134,118); border-color: rgba(3,134,118);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);" v-on:click="click_jiyuan_id" type="success">添加特征值</el-button>
+                                        </div>
+
+                                        <div style="vertical-align: top; width: 10%;">
+                                            <el-button v-on:click="openNewWindow"  style="margin-left: 5px; width: 80%; background-color: rgb(3,134,118); border-color: rgba(3,134,118);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);" type="success">分词</el-button>
+                                        </div>
+
+                                         <div style="vertical-align: top; width: 10%;">
+                                            <el-button v-on:click="openNewWindow2"  style="margin-left: 2px; width: 80%; background-color: rgb(3,134,118); border-color: rgba(3,134,118);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);" type="success">拓展</el-button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                            <div>
+
+                                <div style="position: absolute;right:2vw;width: 898px; bottom: 5vh; height: 480px;;background-color:white;box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow-y: scroll; scrollbar-width: thin;border-radius: 10px;padding: 30px;box-sizing: border-box;">
+                                <div style="padding: 0px 0 0 0">
+                                    <div style="font-size: 15px;font-weight: 900;color: #909399">
+                                        <div style="display: inline-block;vertical-align: top;width: 20%">基元管理库</div>
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <div>
+
+                                    <div v-for=" i in nodes" style="padding: 20px 0 0 0">
+
+                                        <div style="display: inline-block;vertical-align: top;width: 60%">
+
+
+                                            <div style="display: inline-block;vertical-align: top;width: 45%;">
+                                                <el-input  v-model="i.label.符号"
+                                                          placeholder="请输入内容">
+                                                    <template slot="prepend">符号</template>
+                                                </el-input>
+                                            </div>
+
+                                            <div style="display: inline-block;vertical-align: top;width: 45%">
+                                                <el-input  v-model="i.label.对象"
+                                                          placeholder="请输入内容">
+                                                    <template slot="prepend">对象</template>
+                                                </el-input>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div style="display: inline-block;vertical-align: top;width: 30%">
+
+
+                                            <el-button v-on:click="save_user(i.label.符号,i.label.对象,i.id,i.label.infoid)"
+                                                       type="success"
+                                                       style="background-color: #20af52; border-color: #20af52;backdrop-filter: blur(10px);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">全部保存
+                                            </el-button>
+
+                                            <el-button v-on:click="del_user(i.id)"
+                                                       type="danger"
+                                                       style="background-color: #de2222; border-color: #de2222;box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">全部删除
+                                            </el-button>
+
+
+                                        </div>
+
+
+                                        <div v-for="aa in i.label.infoid">
+
+
+                                            <div style="display: inline-block;vertical-align: top;width: 60%;">
+                                                <div style="display: inline-block;vertical-align: top;width: 45%">
+                                                    <div style="display: inline-block;vertical-align: top;">
+                                                        <el-input  v-model="aa.特征"
+                                                                  placeholder="请输入内容">
+                                                            <template slot="prepend">特征</template>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+                                                <div style="display: inline-block;vertical-align: top;width: 45%">
+                                                    <div style="display: inline-block;vertical-align: top;">
+                                                        <el-input  v-model="aa.量值"
+                                                                  placeholder="请输入内容">
+                                                            <template slot="prepend">量值</template>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: inline-block;vertical-align: top;width: 30%;">
+                                                <el-button  v-on:click="click_infos_id(aa.id)"
+                                                           type="danger" style="height: 30px; margin-top: 6px; line-height: 6px; background-color: #de2222; border-color: #de2222;box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">删除
+                                                </el-button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                info_class_id: [[info_class_id]],
+
+                mubiaoid: '',
+
+                selecta: '物元',
+                name: '',
+                obj: '',
+                tezheng: '',
+                va: '',
+
+                //目标基元id
+                to_start_id: '',
+                // 模拟数据
+                nodes: [[infoslist | tojson]],
+                edges: [[toidlist | tojson]],
+
+            }
+        },
+        mounted: function () {
+
+
+
+            this.init_html()
+        },
+        methods: {
+
+            openNewWindow() {
+                window.open('/process_text', '_blank', 'width=860,height=500');
+            },
+
+            openNewWindow2() {
+                // 假设您已经有了当前页面的ID
+                var currentId = this.info_class_id; // 这应该是您当前页面的ID，您需要根据实际情况获取它
+                window.open('/exnlp?id=' + currentId, '_blank', 'width=860,height=500');
+            },
+
+            checkInput() {
+                if (!/^\d+$/.test(this.name)) {
+                    this.$message({
+                        message: '请选择数字作为符号',
+                        type: 'warning'
+                    });
+                    this.name = '';
+                }
+            },
+
+
+            //del
+            click_infos_id(id) {
+                axios.post('/del_info_id', {
+                    id: id,
+                })
+                    .then(res => {
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                            });
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '删除失败',
+                                type: 'warning'
+                            });
+                        }
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+
+
+            },
+
+            //添加基元对象id数据信息
+            click_jiyuan_id() {
+
+                    if (!this.to_start_id || !this.tezheng || !this.va) {
+                        this.$message({
+                            message: '请填写单元对象特征和量值',
+                            type: 'warning'
+                        });
+                        return;
+                    }
+
+                axios.post('/add_info_id', {
+                    //对象
+                    to_start_id: this.to_start_id,
+                    //infos
+                    tezheng: this.tezheng,
+                    va: this.va
+                })
+                    .then(res => {
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '添加成功',
+                                type: 'success'
+                            });
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '添加错误',
+                                type: 'warning'
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+
+
+            },
+
+
+            del_user(id) {
+                axios.post('/del_info', {
+                    id: id,
+                })
+                    .then(res => {
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                            });
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '删除失败',
+                                type: 'warning'
+                            });
+                        }
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+
+            },
+
+            save_user(fuhao, duixiang, id, infoid) {
+                axios.post('/save_info', {
+                    fuhao: fuhao,
+                    duixiang: duixiang,
+                    id: id,
+                    infoid: infoid,
+                })
+                    .then(res => {
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '失败',
+                                type: 'warning'
+                            });
+                        }
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+
+            },
+
+
+            clisk_append() {
+                if (!this.selecta || !this.name || !this.obj) {
+                    this.$message({
+                        message: '请填写单元类型符号和对象',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                axios.post('/add_info', {
+                    //类型
+                    selecta: this.selecta,
+                    //符号
+                    name: this.name,
+                    //对象
+                    obj: this.obj,
+                    //toid
+                    mubiaoid: this.mubiaoid,
+                    //class
+                    info_class_id: this.info_class_id
+                })
+                    .then(res => {
+
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '添加成功',
+                                type: 'success'
+                            });
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+
+
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '添加错误',
+                                type: 'warning'
+                            });
+                        }
+
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+
+
+            },
+
+
+            init_html() {
+                const dataa = this.nodes;
+                var convertedData = [];
+                for (var i = 0; i < dataa.length; i++) {
+
+                    var entry = dataa[i];
+                    var idValue = entry.id;
+                    var labelValue = entry.label;
+                    var labelString = '';
+                    labelString = '符号' + ':' + labelValue['符号'] + '\n' + '对象' + ':' + labelValue['对象'] + '\n';
+
+                    // 遍历特征和量值
+                    var featuresAndValues = labelValue['infoid'].map(function(info) {
+                        return '[' + '特征' + ':' + info['特征'] + ', ' + '量值' + ':' + info['量值'] + ']';  // 在这里添加了中括号
+                    }).join('\n');
+
+                    labelString += featuresAndValues + '\n';
+
+                    var resultEntry = {id: idValue, label: labelString.trim()};
+                    convertedData.push(resultEntry);
+                }
+                const container = document.getElementById('network');
+                const edges = this.edges;
+                const nodes = convertedData;
+                const data = {nodes, edges};
+                const options = {
+                    nodes: {
+                        color: '#75777e', // 设置节点颜色为浅灰色
+                        shape: 'dot', // 设置节点形状为点
+                        size: 10, // 设置节点大小
+                        font: {
+                            color: '#000000', // 设置字体颜色为暗灰色
+                            size: 12, // 设置字体大小
+                        },
+                        borderWidth: 0, // 设置节点边框宽度
+                        borderWidthSelected: 1, // 设置选中节点的边框宽度
+                        chosen: {
+                            node: function(values, id, selected, hovering) {
+                                values.borderWidth = selected ? 2 : 0; // 设置选中时边框宽度为10，否则为0
+                                values.borderColor = selected ? '#3962c9' : '#75777e'; // 设置选中时边框颜色为红色，否则为浅灰色
+                                if (hovering) {
+                                    values.borderColor = '#3962c9'; // 设置悬停时边框颜色为蓝色
+                                    values.borderWidth = 2;
+                                }
+                            }
+                        }
+                    },
+                    edges: {
+                        color: {
+                            color: '#A9A9A9', // 设置边颜色为深灰色
+                            highlight: '#3962c9', // 设置选中边的颜色为暗灰色
+                            hover: '#3962c9', // 设置悬停边的颜色为暗灰色
+                        },
+                        width: 1, // 设置边的宽度
+                        selectionWidth: 1, // 设置选中边的宽度
+                        hoverWidth: 1, // 设置悬停时边的宽度
+                    },
+                    physics: {
+                        stabilization: false,
+                        barnesHut: { // 使用Barnes-Hut算法进行布局
+                            gravitationalConstant: -2000,
+                            springConstant: 0.04,
+                            springLength: 200
+                        }
+                    },
+                    interaction: {
+                        hover: true, // 开启悬停效果
+                    }
+                };
+                const network = new vis.Network(container, data, options);
+                            // 获取所有节点
+                const nodeIds = network.body.data.nodes.getIds();
+
+                // 遍历所有节点
+                for (let i = 0; i < nodeIds.length; i++) {
+                    const nodeId = nodeIds[i];
+
+                    // 获取与节点相连的边的数量
+                    const connectedEdgesCount = network.getConnectedEdges(nodeId).length;
+
+                    // 根据边的数量设置节点的大小
+                    const size = 3 * (connectedEdgesCount + 2);
+
+                    // 更新节点的大小
+                    network.body.data.nodes.update({id: nodeId, size: size});
+
+                    // 根据边的数量动态设置连线长度
+                    network.body.data.edges.forEach(edge => {
+                        if (edge.from === nodeId || edge.to === nodeId) {
+                            edge.length = 50 * (connectedEdgesCount + 2);  // 这里的100是基础长度，你可以根据需要调整
+                        }
+                    });
+                }
+            }
+        }
+    })
+</script>
+<style>
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        cursor: pointer;
+    }
+</style>
+</body>
+</html>

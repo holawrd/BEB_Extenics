@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>基元管理</title>
+
+    <script type="text/javascript" src="/static/cdn/vue.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/axios.min.js"></script>
+    <link href="/static/cdn/index.css" rel="stylesheet">
+    <script src="/static/cdn/index.js"></script>
+
+</head>
+
+<link rel="icon" href="/static/img/icon.ico" type="image/x-icon">
+<body style="margin: 0 auto">
+<style>
+    body {
+        background-color: rgba(2, 67, 94, 1);
+        font-family: 'Microsoft YaHei', Arial, sans-serif;
+    }
+</style>
+<div id="app" style="margin: 0">
+
+    <div  style="margin: 0 auto; display: flex; ">
+
+        <div style="
+        position: fixed;
+        background: rgba(2, 67, 94, 1);
+        left: 0vw;
+        top: 0vh;
+        width: 100vw;
+        height: 10vh;
+        opacity: 1;
+        z-index: 1;
+    ">
+
+        <a href="/main"  style="
+        position: absolute;
+        left: 6vw;
+        top: 2vh;
+        opacity: 1;
+        font-size: 25px;
+        max-width: 100%;
+        max-height: 100%;
+        font-weight: 900;
+        letter-spacing: 0px;
+        line-height: 41px;
+        color: white;
+        text-align: left;
+        vertical-align: top;
+        text-decoration: none;
+    ">
+        基元库管理系统
+        </a>
+
+        <a href="https://extenics.gdut.edu.cn"  style="
+        position: absolute;
+        right: 3.75vw;
+        top: 3.55vh;
+        color: white;
+        text-decoration: none;
+    ">
+        访问可拓学官网
+        </a>
+
+        <a href="/basic_element"  style="
+        position: absolute;
+        right: 13.75vw;
+        top: 3.6vh;
+        color: rgba(2, 67, 94, 1);
+        text-decoration: none;
+        z-index: 6;
+    ">
+        基元管理
+        </a>
+
+        <a href="/user"  style="
+        position: absolute;
+        right: 20.75vw;
+        top: 3.6vh;
+        color: white;
+        text-decoration: none;
+        ">
+        用户管理
+        </a>
+            <div style="
+                    position: absolute;
+                    right: 12.5vw;
+                    top: 1.5vh;
+                    background-color: white;
+                    width: 100px;
+                    height: 85px;
+                    z-index: 3;
+                    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.5);
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    transform: skewY(-5deg);
+                ">
+                </div>
+
+
+    </div>
+
+    <div style="margin: 0 auto; display: flex; ">
+
+    <div style=" position: absolute;
+                    right: 0vw;
+                    top: 8.5vh;
+                    bottom: 0vw;
+                    background-color: white;
+                    width: 100vw;
+                    {#height: 40vh;#}
+                    z-index: 10; ">
+        <div style="width: 85%; box-sizing: border-box; height: 60vh;">
+            <div style="padding: 20px">
+                <div
+                    style="position: absolute; top: 0; background-color: white; top:5vh;left:22vw;width: 70%; padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px;">
+                    <el-form :inline="true" class="demo-form-inline" style="width: 1000px">
+                        <el-form-item label="名称">
+                            <el-input v-model="infos.name" placeholder="名称" style="width: 180px"></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="类别" >
+                            <el-select v-model="infos.class_" placeholder="类别" style="width: 100px">
+                                <el-option label="物" value="1"></el-option>
+                                <el-option label="事" value="2"></el-option>
+                                <el-option label="关系" value="3"></el-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item label="描述" style="width: 270px">
+                            <el-input v-model="infos.info_text" placeholder="描述"></el-input>
+                        </el-form-item>
+
+                        <el-form-item>
+                            <el-button v-on:click="add_user" type="success"
+                            style="background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">添加</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+
+
+            <div style="padding: 20px">
+                <div
+                    style="position: absolute; top:27vh; left: 2vw;width: 13vw; background-color: white; padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px;">
+                    <el-form class="demo-form-inline">
+                        <el-form-item label="名称">
+                            <el-input v-model="input_filter" placeholder="名称"></el-input>
+                        </el-form-item>
+
+                        <el-form-item>
+                            <el-button v-on:click="filter" type="success"
+                                       style="background-color: #20af52; border-color: #20af52;backdrop-filter: blur(10px);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);margin-right: 30px;">查询</el-button>
+
+                            <el-button v-on:click="aaa" type="primary"
+                            style="background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">全部</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+
+
+            <div style="padding: 20px">
+                <div
+                        style="background-color: white;position: absolute;top:27vh;left:22vw;height: 50vh;width: 70%; padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow: auto;border-radius: 10px;">
+                    <el-table :data="tableDataFilter" style="width: 100%; left:0vw" height="height: 50vh" >
+
+                        <el-table-column prop="name" label="名称" width="180" >
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.name" placeholder="请输入内容"></el-input>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column prop="class_" label="类别" width="100">
+                            <template slot-scope="scope">
+                                <el-select v-model="scope.row.class_" placeholder="类别">
+                                    <el-option label="物" value="1"></el-option>
+                                    <el-option label="事" value="2"></el-option>
+                                    <el-option label="关系" value="3"></el-option>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column prop="info_text" label="描述" width="230">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.info_text" placeholder="请输入内容"></el-input>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column prop="time_" label="创建时间" width="180">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.time_" placeholder="请输入内容"></el-input>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column label="操作" >
+                            <template slot-scope="scope">
+                                <a style="padding: 0 10px 0 0 " :href="'/info/' + scope.row.id">
+                                    <el-button :href="'/info/' + scope.row.id" type="primary"
+                                    style="background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">基元库</el-button>
+                                </a>
+
+                                <el-button
+                                        v-on:click="save_user(scope.row.name,scope.row.class_,scope.row.info_text,scope.row.time_,scope.row.id)"
+                                        type="success"
+                                        style="background-color: #20af52; border-color: #20af52;backdrop-filter: blur(10px);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">保存
+                                </el-button>
+                                <el-button v-on:click="del_user(scope.row.id)" type="danger"
+                                style="background-color: #de2222; border-color: #de2222;box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);">删除</el-button>
+
+                            </template>
+                        </el-table-column>
+
+
+                    </el-table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+
+</div>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                infos: {
+                    name: '',
+                    class_: '1',
+                    info_text: '',
+                },
+                tableData: [[BasEleList | tojson]],
+                tableDataFilter: [[BasEleList | tojson]],
+                input_filter: '',
+            }
+        },
+
+        methods: {
+            aaa() {
+                location.reload()
+
+            },
+
+            filter() {
+                this.tableDataFilter = [...this.tableData]; // 使用深度拷贝确保不会修改原始数据
+
+                for (let index = this.tableDataFilter.length - 1; index >= 0; index--) {
+                    if (this.tableDataFilter[index].name.indexOf(this.input_filter) === -1) {
+                        this.tableDataFilter.splice(index, 1); // 使用splice删除元素
+                    }
+                }
+
+                console.log(this.tableData);
+                console.log(this.tableDataFilter);
+            },
+
+            add_user() {
+                if (!this.infos.name || !this.infos.class_ || !this.infos.info_text) {
+                    this.$message({
+                        message: '请填写名称类别和描述',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                axios.post('/add_basic_element', {
+                    infos: this.infos,
+                })
+                    .then(res => {
+
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '添加成功',
+                                type: 'success'
+                            });
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+
+
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '添加错误',
+                                type: 'warning'
+                            });
+                        }
+
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+            },
+
+            save_user(name, class_, info_text, time_, id) {
+                axios.post('/save_basic_element', {
+                    name: name,
+                    class_: class_,
+                    info_text: info_text,
+                    time_: time_,
+                    id: id,
+                })
+                    .then(res => {
+
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
+
+
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '保存失败',
+                                type: 'warning'
+                            });
+                        }
+
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+            },
+
+            del_user(id) {
+                axios.post('/del_basic_element', {
+                    id: id,
+                })
+                    .then(res => {
+
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                            });
+
+
+                            // 等待1秒后执行刷新操作
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+
+
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '删除失败',
+                                type: 'warning'
+                            });
+                        }
+
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+            },
+
+
+        },
+
+    })
+</script>
+<style>
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        cursor: pointer;
+    }
+</style>
+</body>
+
+</html>

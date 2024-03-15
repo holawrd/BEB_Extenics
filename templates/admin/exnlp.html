@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>可拓基元拓展</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link href="/static/cdn/index.css" rel="stylesheet">
+    <script src="/static/cdn/index.js"></script>
+
+    <style>
+        input[type="text"]:hover {
+            border-color: #bdbdbd !important; /* 鼠标悬停时输入框边框颜色加深 */
+        }
+        body {
+        background-color: white;
+        font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        table {
+            width: 500px;
+            border: none;
+            font-size: 14px;
+        }
+        table td {
+            border: none;
+            text-align: center;
+            vertical-align: middle;
+        }
+        table th {
+            border: none;
+        }
+
+        select {
+        width: 100px; /* 调整选择框的宽度 */
+        height: 35px; /* 调整选择框的高度 */
+        padding: 8px; /* 添加一些内边距以增加选择框的高度 */
+        border: 1px solid #bdbdbd; /* 设置选择框的边框 */
+        border-radius: 5px; /* 添加边框圆角 */
+        }
+
+    </style>
+</head>
+
+<link rel="icon" href="/static/img/icon.ico" type="image/x-icon">
+
+<body>
+
+
+
+<div id="app" style="z-index: 10"> <!-- Vue.js app 的根元素 -->
+    <div style="position: absolute;right: 70px;top:150px;z-index: 15">
+    <el-button style="width: 150px; background-color: rgb(3,134,118); border-color: rgba(3,134,118);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);" v-on:click="addFeatureValue" type="success">添加特征值</el-button>
+    </div>
+    <!-- 单元对象选择框 -->
+    <div style="z-index: 15">
+    <el-select style="width: 150px;position: absolute; right: 70px;top:200px;z-index: 100" v-model="selectedNode" placeholder="单元对象">
+        <template v-for="aa in nodes">
+         <el-option :label="aa.label" :value="aa.id"></el-option>
+        </template>
+    </el-select>
+    </div>
+    <!-- 其他HTML代码 -->
+
+</div>
+
+<div id="loading-message" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; color: black; padding: 10px;font-size: 14px;">正在拓展...</div>
+    <form id="search-form" style="position: absolute;top:7vh;left:5vw; width: 690px;height: 35px; background-color: white;padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow: auto;border-radius: 10px; z-index: 10;">
+{#        <div id="loading-message" style="display: none; position: fixed; top: 0; left: 0; width: 100%; text-align: center; background-color: rgba(0,0,0,0.7); color: white; padding: 10px;">正在拓展...</div>#}
+        <input type="text" id="keyword" name="keyword" placeholder="  请输入拓展对象" style="font-size: 14px;width: 700px; height: 35px;border-radius: 5px;border: 1px solid lightgray;top: 30px;left:30px; position: absolute">
+        <input type="submit" value="拓展" style="font-size: 14px;font-weight: bold; color: white;width: 100px; height: 35px;border-radius: 5px;border: none;top: 32px;left:632px; position: absolute;background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3); cursor: pointer;">    </form>
+    <div id="result" style="position: relative;left: 50px;top: 150px;z-index: 10;overflow: auto;width: 75%;"></div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            tezheng: '',
+            va: '',
+            //目标基元id
+            to_start_id: '',
+
+            nodes: [[ nodes_data | tojson ]],  // 使用Jinja2的过滤器将nodes_data转换为JSON
+            selectedNode: null,  // 添加这一行
+        },
+        mounted: function() {
+            // 从URL中获取id参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (id) {
+                this.fetchNodes(id);
+            } else {
+                console.error("No ID provided in URL parameters.");
+            }
+                console.log(this.nodes);  // 打印this.nodes
+        },
+        created() {
+            this.fetchNodes();
+        },
+        watch: {
+            selectedNode(newVal, oldVal) {
+                console.log('selectedNode changed from', oldVal, 'to', newVal);
+                // Add your logic here to handle the change of selectedNode
+            }
+        },
+        methods: {
+            fetchNodes(id) {
+                // 使用ID获取info.html中的单元对象数据
+                axios.get('/info/' + id)
+                    .then(response => {
+                        if (response.data.hasOwnProperty('nodes')) {
+                            this.nodes = response.data.nodes;
+                            console.log(this.nodes);
+                        } else {
+                            {#console.error('Error: response data does not have a nodes property');#}
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching nodes:', error);
+                    });
+            },
+            addFeatureValue() {
+                // 获取选中的行
+                var selectedRows = $('input.row-checkbox:checked').closest('tr');
+                if (selectedRows.length === 0) {
+                    this.$message({
+                        message: '请选择基元',
+                        type: 'warning'
+                        });
+                    return;
+                }
+
+                // 获取选中行的特征和量值
+                var featuresAndValues = selectedRows.map(function() {
+                    var cells = $(this).find('td');
+                    return {
+                        feature: $(cells[3]).text(),
+                        value: $(cells[4]).text()
+                    };
+                }).get();
+
+
+                // 发送POST请求，将特征和量值添加到选择的单元对象对应的数据表中
+                for (var i = 0; i < featuresAndValues.length; i++) {
+                    axios.post('/add_info_id', {
+                        to_start_id: this.selectedNode,
+                        tezheng: featuresAndValues[i].feature,
+                        va: featuresAndValues[i].value
+                    })
+                    .then(response => {
+                        console.log('Feature value added successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error adding feature value:', error);
+                    });
+                }
+            },
+            showMessage: function(message, type) {
+            this.$message({
+                message: message,
+                type: type
+            });
+        },
+    },
+    });
+
+$(document).ready(function(){
+
+    $('#search-form').on('submit', function(e) {
+        e.preventDefault();
+        var keyword = $('#keyword').val();
+        if (!keyword.trim()) {  // 如果输入的关键词为空（包括空格）
+            app.showMessage('请输入拓展对象', 'warning');
+            return false;  // 阻止表单提交
+        }
+        var prompt = "现在你作为一个专业且学识渊博的知识库,请再网络上搜索尽可能多且全面的列举十条'" + keyword + "'可以包含的特征和量值并去除敏感违禁属性,请尽可能的多列举每个特征的量值,以矩阵[(1)(对象)(特征)(量值)][(2)(对象)(特征)(量值)][(序号)(对象)(特征)(量值)]的形式列出,其中对象就是输入的关键词,相同特征对应的量值放在同一()内,如:[(1)(对象)(特征)(量值1,量值2)].直接返回矩阵内的结果,如果搜索的关键词为可拓学,请给出返回创始人:蔡文作为第一个特征和量值;创立时间:1983年为第二个特征和量值;研究对象:实现创新及处理矛盾问题为第三个特征和量值;研究方法:拓展分析,共轭分析,可拓变换,可拓创意生成,优度评选为第四个特征和量值;应用领域:人工智能,可拓控制,可拓营销,可拓数据挖掘为第五个特征和量值;理论基础:基元理论,可拓集合,可拓逻辑为第六个特征和量值;研究成果:论文,专著,专利为第七个特征和量值;学科交叉:数学,管理学,哲学,心理学,教育学为第八个特征和量值;影响力:国际化,普及广泛为第九个特征和量值;教育方法:线上,线下为第十个特征和量值,不需要返回任何无关的信息以及'注:''关键词:'等内容。";
+        // Show the loading message
+        $('#loading-message').show();
+        $.ajax({
+            url: '/exnlp',
+            type: 'POST',
+            data: { question: prompt },
+            success: function(response) {
+
+                // Hide the loading message
+                $('#loading-message').hide();
+                // Process the response and format as a table
+                var resultArray = response.match(/\(\d+\)\(.*?\)\(.*?\)\(.*?\)/g);
+                if (resultArray) {
+                    var table = $('<table border="1"></table>');
+                    // Add table header
+                    table.append('<tr><th><input type="checkbox" id="select-all"></th><th>序号</th><th>对象</th><th>特征</th><th>量值</th></>');
+                    // Add rows for each match
+                    $.each(resultArray, function(index, item) {
+                        var match = item.match(/\((.*?)\)/g);
+                        var row = $('<tr></tr>');
+                        // Add a checkbox at the beginning of each row
+                        row.append($('<td><input type="checkbox" class="row-checkbox"></td>'));
+                        $.each(match, function(index, content) {
+                            content = content.replace(/[()]/g, ''); // Remove parentheses
+                            if (index > 1) { // For feature and value columns
+                                row.append($('<td contenteditable="true"></td>').text(content));
+                            } else {
+                                row.append($('<td></td>').text(content));
+                            }
+                        });
+
+                        table.append(row);
+                    });
+                    $('#result').html(table);
+                    // Handle the click event of the "select all" checkbox
+                    $('#select-all').click(function() {
+                        // Check or uncheck all row checkboxes
+                        $('.row-checkbox').prop('checked', this.checked);
+                    });
+                } else {
+                    $('#result').text('无法解析结果');
+                }
+            },
+            error: function(xhr, status, error) {
+                // Hide the loading message
+                $('#loading-message').hide();
+                console.error("Error: " + error);
+                $('#result').text("无法获取响应");
+            }
+        });
+    });
+});
+</script>
+
+</html>

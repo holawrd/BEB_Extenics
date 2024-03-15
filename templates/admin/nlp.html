@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/img/icon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>自然语言处理</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link href="/static/cdn/index.css" rel="stylesheet">
+    <script src="/static/cdn/index.js"></script>
+    <style>
+
+        input[type="text"]:hover {
+            border-color: #bdbdbd !important; /* 鼠标悬停时输入框边框颜色加深 */
+        }
+
+        body {
+        background-color: white;
+        font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+
+        #result {
+            position: relative;
+            left: 50px;
+            top: 150px;
+            z-index: 10;
+            overflow: auto; /* 添加这一行 */
+            width: 700px;
+        }
+
+        #result table {
+            font-size: 14px; /* 调整字体大小 */
+            width: 100%; /* 调整宽度 */
+            border-collapse: collapse; /* 合并边框 */
+            table-layout: auto; /* 设置表格布局为自动 */
+            {#border: 1px solid black; /* 为整个表格设置边框 */#}
+        }
+
+        #result table th,
+        #result table td {
+            {#border: 1px solid black; /* 为每一个单元格设置边框 */#}
+            {#padding: 10px; /* 添加内边距 */#}
+            user-select: text; /* 允许用户选择文本 */
+            white-space: nowrap; /* 设置内容不换行 */
+            cursor: pointer; /* 鼠标悬停时变成小手 */
+        }
+        #result table th:hover,
+        #result table td:hover {
+            font-weight: bold; /* 鼠标悬停时文字变粗 */
+        }
+
+        #result table th:first-child,
+        #result table td:first-child {
+            width: 100px; /* 调整第一列的宽度 */
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+
+<div id="app">
+    <form id="text-form" action="/process_text" method="post" style="position: absolute;top:7vh;left:5vw; width: 690px;height: 35px; background-color: white;padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);overflow: auto;border-radius: 10px;
+        z-index: 10;">
+        <input type="text" id="text" name="text" placeholder="  请输入一段文字" style="font-size: 14px;width: 700px; height: 35px;border-radius: 5px;border: 1px solid lightgray;top: 30px;left:30px; position: absolute">
+        <input type="submit" value="提交" style="font-size: 14px;font-weight: bold; color: white;width: 100px; height: 35px;border-radius: 5px;border: none;top: 32px;left:632px; position: absolute;background-color: rgba(2, 67, 94, 1); border-color: rgba(2, 67, 94, 1);box-shadow: inset 3px 3px 3px rgba(0, 0, 0, 0.3);cursor: pointer;">
+    </form>
+</div>
+{#    <button onclick="location.href='/search'">进入exnlp.html</button>#}
+{#    <div style="position: absolute; top:30vh; left: 2vw;width: 500px; background-color: white; padding: 40px 40px 20px 40px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);border-radius: 10px;">#}
+    <div>
+        <div id="result">
+            <table>
+                {% for tag, words in results.items() %}
+                <tr>
+                    <th>{{ tag }}</th>
+                    {% for word in words %}
+                    <td>{{ word }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+
+    <script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            // ...
+        },
+        methods: {
+            showMessage: function(message, type) {
+                this.$message({
+                    message: message,
+                    type: type
+                });
+            },
+            // ...
+        },
+        // ...
+    });
+
+        function copyText(element) {
+            var range, selection, worked;
+
+            if (document.body.createTextRange) {
+                range = document.body.createTextRange();
+                range.moveToElementText(element);
+                range.select();
+                document.execCommand('copy');
+            } else if (window.getSelection) {
+                selection = window.getSelection();
+                range = document.createRange();
+                range.selectNodeContents(element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand('copy');
+            }
+        }
+
+$(document).ready(function(){
+    $('#text-form').on('submit', function(e) {
+        e.preventDefault();
+        var text = $('#text').val();
+        if (!text.trim()) {  // 如果输入的文本为空（包括空格）
+            app.showMessage('请输入一段文字', 'warning');
+            return false;  // 阻止表单提交
+        }
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: $(this).serialize(),
+            success: function(data) {
+                var table = $('<table></table>');
+                var addedWords = {};  // 用于跟踪已经添加的单词
+                $.each(data, function(tag, words) {
+                    var row = $('<tr></tr>');
+                    row.append($('<th></th>').text(tag));
+                    $.each(words, function(index, word) {
+                        if (!addedWords[word]) {  // 如果这个单词还没有被添加
+                            var td = $('<td></td>').text(word);
+                            td.on('click', function() {
+                                copyText(this);
+                                {#window.open('/exnlp_get', '_blank','width=860,height=500');  // 在新窗口中打开指定的URL#}
+                            });
+                            row.append(td);
+                            addedWords[word] = true;  // 标记这个单词已经被添加
+                        }
+                    });
+                    table.append(row);
+                });
+                $('#result').html(table);
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

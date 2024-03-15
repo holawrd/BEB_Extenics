@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基元库管理系统</title>
+
+    <script type="text/javascript" src="/static/cdn/vue.min.js"></script>
+    <script type="text/javascript" src="/static/cdn/axios.min.js"></script>
+    <link href="/static/cdn/index.css" rel="stylesheet">
+    <script src="/static/cdn/index.js"></script>
+</head>
+<link rel="icon" href="/static/img/icon.ico" type="image/x-icon">
+<body style="background-color: white; overflow: auto; ">
+<style>
+    body {
+        font-family: 'Microsoft YaHei', Arial, sans-serif;
+    }
+</style>
+
+<div style="
+    background-image: url('../static/img/mainbg.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: fixed;
+    left: 450px;
+    bottom: 35px;
+    width: 375.7px; /* 442px * 0.85 */
+    height: 498.61px; /* 586.6px * 0.85 */
+    opacity: 1;
+    z-index: -0.5;
+">
+</div>
+
+ <div  style="margin: 0 auto; display: flex; ">
+
+        <div style="
+        position: fixed;
+        background: white;
+        left: 0vw;
+        top: 0vh;
+        width: 100vw;
+        height: 10vh;
+        opacity: 1;
+        z-index: -2;
+    ">
+
+        <a href="/main"  style="
+        position: absolute;
+        left: 6vw;
+        top: 2vh;
+        opacity: 1;
+        font-size: 25px;
+        max-width: 100%;
+        max-height: 100%;
+        font-weight: 900;
+        letter-spacing: 0px;
+        line-height: 41px;
+        color: rgba(2, 67, 94, 1);
+        text-align: left;
+        vertical-align: top;
+        text-decoration: none;
+    ">
+        基元库管理系统
+        </a>
+
+        <a href="https://extenics.gdut.edu.cn"  style="
+        position: absolute;
+        right: 3.75vw;
+        top: 3.55vh;
+        color: rgba(2, 67, 94, 1);
+        text-decoration: none;
+    ">
+        访问可拓学官网
+        </a>
+
+{#        <a href="/basic_element"  style="#}
+{#        position: absolute;#}
+{#        right: 13.75vw;#}
+{#        top: 3.6vh;#}
+{#        color: rgba(2, 67, 94, 1);#}
+{#        text-decoration: none;#}
+{#    ">#}
+{#        基元管理#}
+{#        </a>#}
+{##}
+{#        <a href="/user"  style="#}
+{#        position: absolute;#}
+{#        right: 20.75vw;#}
+{#        top: 3.6vh;#}
+{#        color: rgba(2, 67, 94, 1);#}
+{#        text-decoration: none;#}
+{#        z-index: 6;#}
+{#        ">#}
+{#        用户管理#}
+{#        </a>#}
+{#            #}
+
+    </div>
+
+<div style="
+    position: fixed;
+    left: 0vw;
+    top: 8.5vh;
+    width: 60vw;
+    height: 70vh;
+    opacity: 1;
+    background: rgba(172, 210, 230, 1);
+    z-index: -1;
+">
+    <p style="
+        position: absolute;
+        left: 10vw;
+        top: 13vh;
+        width: 300px;
+        height: 129px;
+        opacity: 1;
+        font-size: 60px;
+        font-weight: 900;
+        max-width: 100%;
+        max-height: 100%;
+        letter-spacing: 0px;
+        line-height: 70px;
+        color: rgba(0, 0, 0, 1);
+        text-align: left;
+        vertical-align: top;
+        z-index: 5;
+    ">
+        万物皆可拓
+    </p>
+    <p style="
+        position: absolute;
+        left: 11vw;
+        top: 37vh;
+        width: 300px;
+        height: 120px;
+        opacity: 1;
+        max-width: 100%;
+        max-height: 100%;
+        font-size: 20px;
+        font-weight: 450;
+        letter-spacing: 0px;
+        line-height: 30px;
+        color: rgba(0, 0, 0, 1);
+        text-align: left;
+        vertical-align: top;
+        z-index: 5;
+    ">
+        利用基元库管理系统，<br>
+        构建属于您的知识体系。<br>
+        开拓，严谨，谦和，诚信。
+    </p>
+</div>
+
+<div style="
+    position: fixed;
+    right: 0vw;
+    top: 8.5vh;
+    width: 40vw;
+    height: 100vh;
+    opacity: 1;
+    background: rgba(2, 67, 94, 1);
+    z-index: 5;
+    box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.5) inset;
+">
+</div>
+
+<div id="app">
+
+    <div style="margin: 0 auto;position: fixed;
+                right: 5vw;
+                top: 30vh;
+                width: 30vw;
+                height: 40vh;
+                background-color: rgba(255, 255, 255, 0.5);
+                border-radius: 15px;
+                box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+                z-index: 6;
+                backdrop-filter: blur(10px);"
+    >
+        <div style="padding: 10px 40px 40px 40px; display: flex; flex-direction: column; align-items: center;">
+            <h1 style="text-align: center">欢迎使用</h1>
+            <el-input v-model="username" placeholder="账号" style="margin-top: 5px;"></el-input>
+
+            <el-input type="password" style="padding: 20px 0" v-model="password" placeholder="密码"></el-input>
+
+            <el-button v-on:click="login_post" style="width: 30%;background-color: rgba(2, 67, 94, 1);border-color: rgba(2, 67, 94, 1);color: #FFFFFF; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);margin-top: 10px;" >登  录</el-button>
+        </div>
+
+    </div>
+
+
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                infos: '',
+                username: localStorage.getItem('username') || '',
+                password: localStorage.getItem('password') || '',
+            }
+        },
+
+        methods: {
+            login_post() {
+                axios.post('/login', {
+                    username: this.username,
+                    password: this.password,
+                })
+                    .then(res => {
+
+                        if (res.data == '1') {
+                            this.$message({
+                                message: '登录成功',
+                                type: 'success'
+                            });
+
+                            // 保存账号和密码到localStorage
+                            localStorage.setItem('username', this.username);
+                            localStorage.setItem('password', this.password);
+
+                            location.href = '/user'
+                        }
+                        if (res.data == '0') {
+                            this.$message({
+                                message: '账号密码错误',
+                                type: 'warning'
+                            });
+                        }
+
+                        if (res.data == '3') {
+                            this.$message({
+                                message: '账号禁用',
+                                type: 'warning'
+                            });
+                        }
+
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('网络传输失败');
+                    });
+            }
+
+
+        },
+
+    })
+</script>
+</body>
+</html>

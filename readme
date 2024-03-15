@@ -1,0 +1,40 @@
+1、安装源文件：
+git clone https://github.com/holawrd/BEB-Extenics.git
+
+
+2、创建虚拟环境：
+python3 -m venv venv
+
+
+3、激活虚拟环境：
+source venv/bin/activate
+
+
+4、安装依赖：
+pip3 install -r requirements.txt
+
+
+5、验证安装：
+pip3 list
+
+
+6、配置数据库： #MySQL
+db_name = "BasicElementBase" #数据库架构名
+username = "root" #数据库用户名
+password = "root" #数据库密码
+host = "localhost" #数据库地址
+engine = create_engine(f'mysql+pymysql://{username}:{password}@{host}/{db_name}', echo=False, future=True)
+
+
+7、创建数据库： #MySQL
+在MySQL中创建名为BasicElementBase的数据库,以DataGrip为例：
+create schema BasicElementBase collate,utf8mb4_general_ci;
+
+
+8、创建数据表： #MySQL
+python3 sql_config.py
+
+
+9、运行程序：
+python3 app.py
+```
